@@ -14,16 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Authentication Plugin:
- *
- * Checks against an external database.
- *
- * @package    licenses_vicensvives
- * @author     CV&A Consulting
- * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
- */
-
 require('../../config.php');
 
 require_once($CFG->dirroot.'/blocks/licenses_vicensvives/locallib.php');
@@ -52,7 +42,7 @@ class books_form extends moodleform {
         $mform->addElement('select', 'idSubject', $string, $subjects);
         $mform->setType('idSubject', PARAM_INT);
 
-        $string = get_string('idLevel', 'block_courses_vicensvives');
+        $string = get_string('level', 'block_courses_vicensvives');
         $mform->addElement('select', 'idlevel', $string, $levels);
         $mform->setType('idlevel', PARAM_INT);
 
@@ -115,24 +105,24 @@ foreach ($ws->subjects($lang) as $subject) {
 }
 
 $licenses = vicensvives_count_licenses();
-$all_books = array();
+$allbooks = array();
 
 foreach ($ws->books() as $book) {
     if (isset($licenses[$book->idBook])) {
-        $all_books[] = $book;
+        $allbooks[] = $book;
     }
 }
 
-$filtered_books = array();
+$filteredbooks = array();
 
 $customdata = array('levels' => $levels, 'subjects' => $subjects);
 $form = new books_form($baseurl, $customdata, 'get');
 
 if ($form->is_cancelled()) {
     redirect($baseurl);
-} elseif ($data = $form->get_data()) {
+} else if ($data = $form->get_data()) {
 
-    foreach ($all_books as $book) {
+    foreach ($allbooks as $book) {
         if (!empty($data->fullname) and !str_contains($book->fullname, $data->fullname)) {
             continue;
         }
@@ -145,10 +135,10 @@ if ($form->is_cancelled()) {
         if (!empty($data->isbn) and !str_contains($book->isbn, $data->isbn)) {
             continue;
         }
-        $filtered_books[] = $book;
+        $filteredbooks[] = $book;
     }
 } else {
-    $filtered_books = $all_books;
+    $filteredbooks = $allbooks;
 }
 
 echo $OUTPUT->header();
@@ -156,11 +146,11 @@ echo $OUTPUT->heading('');
 
 $form->display();
 
-if ($filtered_books) {
-    $a = array('total' => count($all_books), 'found' => count($filtered_books));
+if ($filteredbooks) {
+    $a = array('total' => count($allbooks), 'found' => count($filteredbooks));
     $string = get_string('searchresult', 'block_courses_vicensvives', $a);
 } else {
-    $string = get_string('searchempty', 'block_courses_vicensvives', count($all_books));
+    $string = get_string('searchempty', 'block_courses_vicensvives', count($allbooks));
 }
 echo $OUTPUT->heading($string);
 
@@ -172,23 +162,23 @@ $table->column_class('actions', 'vicensvives_actions');
 $table->define_headers(array(
     get_string('fullname', 'block_courses_vicensvives'),
     get_string('subject', 'block_courses_vicensvives'),
-    get_string('idLevel', 'block_courses_vicensvives'),
+    get_string('level', 'block_courses_vicensvives'),
     get_string('isbn', 'block_courses_vicensvives'),
-    get_string('studentlicenses','block_licenses_vicensvives')
+    get_string('studentlicenses', 'block_licenses_vicensvives')
     . '<br/> (' . get_string('activated', 'block_licenses_vicensvives')
     . ' / ' .  get_string('total', 'block_licenses_vicensvives') . ')',
-    get_string('teacherlicenses','block_licenses_vicensvives')
+    get_string('teacherlicenses', 'block_licenses_vicensvives')
     . '<br/> (' . get_string('activated', 'block_licenses_vicensvives')
     . ' / ' . get_string('total', 'block_licenses_vicensvives') . ')',
 ));
-$table->pagesize(50, count($filtered_books));
+$table->pagesize(50, count($filteredbooks));
 $table->setup();
 
 // Ordenación
-collatorlib::asort_objects_by_property($filtered_books, 'fullname');
+core_collator::asort_objects_by_property($filteredbooks, 'fullname');
 
 // Paginación
-$books = array_slice($filtered_books, $table->get_page_start(), $table->get_page_size());
+$books = array_slice($filteredbooks, $table->get_page_start(), $table->get_page_size());
 
 foreach ($books as $book) {
     $table->add_data(array(

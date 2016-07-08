@@ -16,9 +16,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015091700;
+$plugin->version   = 2016070700;
 $plugin->requires  = 2012062500;
 $plugin->component = 'block_licenses_vicensvives';
 $plugin->dependencies = array(
-    'block_courses_vicensvives' => 2015042800,
+    'block_courses_vicensvives' => 2016070700,
 );

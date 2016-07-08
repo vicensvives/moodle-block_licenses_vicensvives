@@ -1,5 +1,5 @@
-Bloque de licencias Vicens Vives (Moodle 2.3, 2.5, 2.6, 2.7 y 2.8)
-==================================================================
+Bloque de licencias Vicens Vives
+================================
 
 Bloque que informa de las licencias disponibles y utilizadas.
 
@@ -9,3 +9,5 @@ profesores y estudiantes.
 
 El bloque incluye un enlace a una lista con la información de las licencias de
 todos los libros.
+
+Versiones de Moodle: 2.3, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0 y 3.1
