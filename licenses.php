@@ -20,56 +20,18 @@ require_once($CFG->dirroot.'/blocks/licenses_vicensvives/locallib.php');
 require_once($CFG->dirroot.'/lib/formslib.php');
 require_once($CFG->dirroot.'/lib/tablelib.php');
 
-class books_form extends moodleform {
-
-    public function definition() {
-        global $CFG;
-
-        $mform = $this->_form;
-        $levels = $this->_customdata['levels'];
-        $subjects = $this->_customdata['subjects'];
-
-        $mform->addElement('header', 'search', get_string('search'));
-        if (method_exists($mform, 'setExpanded')) {
-            $mform->setExpanded('search', false);
-        }
-
-        $string = get_string('fullname', 'block_courses_vicensvives');
-        $mform->addElement('text', 'fullname', $string);
-        $mform->setType('fullname', PARAM_TEXT);
-
-        $string = get_string('subject', 'block_courses_vicensvives');
-        $mform->addElement('select', 'idSubject', $string, $subjects);
-        $mform->setType('idSubject', PARAM_INT);
-
-        $string = get_string('level', 'block_courses_vicensvives');
-        $mform->addElement('select', 'idlevel', $string, $levels);
-        $mform->setType('idlevel', PARAM_INT);
-
-        $string = get_string('isbn', 'block_courses_vicensvives');
-        $mform->addElement('text', 'isbn', $string);
-        $mform->setType('isbn', PARAM_TEXT);
-
-        $buttonarray = array();
-        $buttonarray[] = &$mform->createElement('submit', 'search', get_string('search'));
-        $buttonarray[] = &$mform->createElement('cancel', 'reset', get_string('reset'));
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
-    }
-}
-
 function str_contains($haystack, $needle) {
     // Normaliza el texto a carñacteres ASCII en mínuscula y sin espacios duplicados
     $normalize = function($text) {
-        $text = textlib::specialtoascii($text);
-        $text = textlib::strtolower($text);
+        $text = core_text::specialtoascii($text);
+        $text = core_text::strtolower($text);
         $text = preg_replace('/\s+/', ' ', trim($text));
         return $text;
     };
     $haystack = $normalize($haystack);
     $needle = $normalize($needle);
-    return textlib::strpos($haystack, $needle) !== false;
+    return core_text::strpos($haystack, $needle) !== false;
 }
-
 
 $courseid = optional_param('course', SITEID, PARAM_INT);
 
@@ -113,32 +75,36 @@ foreach ($ws->books() as $book) {
     }
 }
 
-$filteredbooks = array();
+$search = array(
+    'fullname' => optional_param('fullname', '', PARAM_TEXT),
+    'idsubject' => optional_param('idsubject', '', PARAM_INT),
+    'idlevel' => optional_param('idlevel', '', PARAM_INT),
+    'isbn' => optional_param('isbn', '', PARAM_TEXT),
+);
 
-$customdata = array('levels' => $levels, 'subjects' => $subjects);
-$form = new books_form($baseurl, $customdata, 'get');
+$customdata = array('levels' => $levels, 'subjects' => $subjects, 'search' => $search);
+$form = new \block_courses_vicensvives\filter_form(null, $customdata, 'get');
 
 if ($form->is_cancelled()) {
     redirect($baseurl);
-} else if ($data = $form->get_data()) {
+}
 
-    foreach ($allbooks as $book) {
-        if (!empty($data->fullname) and !str_contains($book->fullname, $data->fullname)) {
-            continue;
-        }
-        if (!empty($data->idSubject) and $book->idSubject != $data->idSubject) {
-            continue;
-        }
-        if (!empty($data->idlevel) and $book->idLevel != $data->idlevel) {
-            continue;
-        }
-        if (!empty($data->isbn) and !str_contains($book->isbn, $data->isbn)) {
-            continue;
-        }
-        $filteredbooks[] = $book;
+$filteredbooks = array();
+
+foreach ($allbooks as $book) {
+    if ($search['fullname'] and !str_contains($book->fullname, $search['fullname'])) {
+        continue;
     }
-} else {
-    $filteredbooks = $allbooks;
+    if ($search['idsubject'] and $book->idSubject != $search['idsubject']) {
+        continue;
+    }
+    if ($search['idlevel'] and $book->idLevel != $search['idlevel']) {
+        continue;
+    }
+    if ($search['isbn'] and !str_contains($book->isbn, $search['isbn'])) {
+        continue;
+    }
+    $filteredbooks[$book->idBook] = $book;
 }
 
 echo $OUTPUT->header();
@@ -155,7 +121,8 @@ if ($filteredbooks) {
 echo $OUTPUT->heading($string);
 
 $table = new flexible_table('vicensvives_books');
-$table->define_baseurl($baseurl);
+$url = new moodle_url($baseurl, $search);
+$table->define_baseurl($url);
 $table->define_columns(array('name', 'subject', 'level', 'isbn', 'student', 'teacher'));
 $table->set_attribute('class', 'vicensvives_books');
 $table->column_class('actions', 'vicensvives_actions');
