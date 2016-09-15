@@ -14,19 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$string['pluginname'] = 'Licenses Vicens Vives';
+$string['pluginname'] = 'Llicències Vicens Vives';
 
 // Contenido del bloque.
-$string['showlicenses'] = 'Show licenses';
-$string['studentlicenses'] = 'Student licenses';
-$string['teacherlicenses'] = 'Teacher licenses';
-$string['activated'] = 'active';
-$string['total'] = 'total';
+$string['showlicenses'] = 'Veure llicències';
+$string['studentlicenses'] = 'Llicències estudiant';
+$string['teacherlicenses'] = 'Llicències professor';
+$string['activated'] = 'actives';
+$string['total'] = 'totals';
 
 // Páginas del bloque.
-$string['licenses'] = 'Licenses';
-$string['nohaylicencias'] = 'There are no licenses to show';
+$string['licenses'] = 'Llicències';
+$string['nohaylicencias'] = 'No hi ha cap llicència per mostrar';
 
 // Permisos
-$string['licenses_vicensvives:addinstance'] = 'Add block instance.';
-$string['licenses_vicensvives:myaddinstance'] = 'Add block instance into my.';
+$string['licenses_vicensvives:addinstance'] = 'Crear instància del bloc.';
+$string['licenses_vicensvives:myaddinstance'] = 'Crear instància del bloc en my.';
